@@ -1,9 +1,3 @@
 Treesitter [RSL](https://ru.wikipedia.org/wiki/RSL) parser (WIP)
 
-## Installation in Neovim
-
-Packer:
-
-```lua
-use {'yohanson/tree-sitter-rsl'}
-```
+Based on [yohanson tree-sitter-rsl](https://github.com/yohanson/tree-sitter-rsl)

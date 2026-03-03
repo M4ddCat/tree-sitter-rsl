@@ -1539,6 +1539,7 @@
   {
     "type": "unit",
     "named": true,
+    "root": true,
     "fields": {},
     "children": {
       "multiple": true,
@@ -1971,6 +1972,10 @@
     "named": false
   },
   {
+    "type": "\\{curdate\\}",
+    "named": false
+  },
+  {
     "type": "]",
     "named": false
   },
@@ -2012,7 +2017,8 @@
   },
   {
     "type": "comment",
-    "named": true
+    "named": true,
+    "extra": true
   },
   {
     "type": "const",
@@ -2299,10 +2305,6 @@
     "named": false
   },
   {
-    "type": "valtype",
-    "named": false
-  },
-  {
     "type": "var",
     "named": false
   },
@@ -2332,10 +2334,6 @@
   },
   {
     "type": "{",
-    "named": false
-  },
-  {
-    "type": "{curdate}",
     "named": false
   },
   {

@@ -1,4 +1,5 @@
 {
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
   "name": "rsl",
   "word": "_word_identifier",
   "rules": {
@@ -1336,12 +1337,12 @@
               "value": 1,
               "content": {
                 "type": "PATTERN",
-                "value": "{[Cc][Uu][Rr][Dd][Aa][Tt][Ee]}"
+                "value": "\\{[Cc][Uu][Rr][Dd][Aa][Tt][Ee]\\}"
               }
             }
           },
           "named": false,
-          "value": "{curdate}"
+          "value": "\\{curdate\\}"
         }
       ]
     },
@@ -3247,6 +3248,6 @@
   "precedences": [],
   "externals": [],
   "inline": [],
-  "supertypes": []
+  "supertypes": [],
+  "reserved": {}
 }
-
