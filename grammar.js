@@ -1,5 +1,3 @@
-// vi:ts=2:sw=2:et
-
 module.exports = grammar({
   name: "rsl",
 
@@ -7,7 +5,10 @@ module.exports = grammar({
 
   word: ($) => $._word_identifier,
 
-  conflicts: ($) => [[$.variable_definition, $.identifier]],
+  conflicts: ($) => [
+    [$.variable_definition, $.identifier],
+    [$._expression, $.variable_assignment],
+  ],
 
   rules: {
     unit: ($) =>
@@ -76,6 +77,7 @@ module.exports = grammar({
     type_declaration: ($) => seq(":", $.type),
 
     type: ($) => choice($.scalar_type, $.object_type),
+    
     scalar_type: ($) =>
       choice(
         caseInsensitive("variant"),
@@ -92,6 +94,7 @@ module.exports = grammar({
         caseInsensitive("r2m"),
         caseInsensitive("memaddr"),
       ),
+      
     object_type: ($) =>
       choice(
         caseInsensitive("tbfile"),
@@ -99,9 +102,12 @@ module.exports = grammar({
         caseInsensitive("tarray"),
         caseInsensitive("tstreamdoc"),
         caseInsensitive("object"),
+        $.identifier,
       ),
+      
     boolean_literal: ($) =>
       choice(caseInsensitive("true"), caseInsensitive("false")),
+      
     constant_builtin: ($) =>
       choice(
         caseInsensitive("v_integer"),
@@ -121,14 +127,17 @@ module.exports = grammar({
         caseInsensitive("v_moneyl"),
         caseInsensitive("v_undef"),
       ),
+      
     special_literal: ($) =>
       choice(
         caseInsensitive("optval"),
         caseInsensitive("nullval"),
         caseInsensitive("null"),
       ),
+      
     variable_builtin: ($) =>
       choice(caseInsensitive("this"), caseInsensitive("\\{curdate\\}")),
+      
     macro_builtin: ($) => choice(caseInsensitive("valtype")),
 
     variable_definition: ($) =>
@@ -153,6 +162,7 @@ module.exports = grammar({
         caseInsensitive("const"),
         commaSep1(seq($.constant, $.assignment_operator, $._expression)),
       ),
+      
     constant: ($) => $._typed_identifier,
 
     array_definition: ($) =>
@@ -172,6 +182,7 @@ module.exports = grammar({
         ")",
         repeat($.record_parameter),
       ),
+      
     record_parameter: ($) =>
       choice(
         caseInsensitive("normal"),
@@ -183,7 +194,7 @@ module.exports = grammar({
         caseInsensitive("blob"),
         seq(
           caseInsensitive("txt"),
-          optional($._integer), // line buffer size
+          optional($._integer),
         ),
         seq(
           choice(caseInsensitive("key"), caseInsensitive("sort")),
@@ -194,12 +205,13 @@ module.exports = grammar({
     number: ($) => choice($._integer, $._decimal),
     _integer: ($) => /\d+/,
     _decimal: ($) => /\d+\.\d+/,
-    string: ($) => repeat1(/"([^"]|\\")*"/),
+    
+    string: ($) => /"([^"\\]|\\.)*"/,
 
     comment: ($) =>
       token(
         choice(
-          seq("//", /(\\(.|\r?\n)|[^\\\n])*/),
+          seq("//", /[^\n]*/),
           seq("/*", /[^*]*\*+([^/*][^*]*\*+)*/, "/"),
         ),
       ),
@@ -235,7 +247,6 @@ module.exports = grammar({
 
     argument_list: ($) => seq("(", optional(commaSep($._expression)), ")"),
 
-    // for (var i, 0, 100, 1)
     for_loop: ($) =>
       seq(
         caseInsensitive("for"),
@@ -349,6 +360,7 @@ module.exports = grammar({
         $.assignment_operator,
         $._expression,
       ),
+      
     _expression: ($) =>
       prec(
         1,
@@ -380,6 +392,7 @@ module.exports = grammar({
 
     binary_expression: ($) =>
       prec.left(seq($._expression, $.binary_operator, $._expression)),
+      
     binary_operator: ($) =>
       choice(
         prec.left(3, $.multiplication_operator),
@@ -387,6 +400,7 @@ module.exports = grammar({
         prec.left(1, $.relation_operator),
         prec.right($.assignment_operator),
       ),
+      
     multiplication_operator: ($) => choice("*", "/", caseInsensitive("and")),
     add_operator: ($) => choice("+", "-", caseInsensitive("or")),
     relation_operator: ($) => choice("==", "!=", "<", "<=", ">", ">="),
@@ -410,6 +424,7 @@ function caseInsensitive(keyword, aliasAsWord = true) {
               : l,
           )
           .join(""),
+        "i",
       ),
     ),
   );
