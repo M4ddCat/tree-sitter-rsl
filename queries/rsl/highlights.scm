@@ -1,109 +1,176 @@
-; vi:ts=1:sw=1:et
-(scalar_type) @type.builtin
-(object_type) @type.builtin
+; ============================================
+; Комментарии
+; ============================================
+(comment) @comment
+(block_comment) @comment
+(line_comment) @comment
 
-[
- "tarray"
- "tbfile"
- "trechandler"
- "tstreamdoc"
- "object"
-] @type
+; ============================================
+; Строки
+; ============================================
+(string) @string
+(string_literal) @string
 
+; ============================================
+; Числа
+; ============================================
+(number) @number
+(integer) @number
+(float) @number.float
+
+; ============================================
+; Ключевые слова управления
+; ============================================
 [
- "onerror"
- "end"
- "class"
- "with"
- "for"
- "while"
- "var"
- "import"
- "local"
- "private"
- "if"
- "else"
- "elif"
+  "Import"
+  "Break"
+  "Continue"
+  "Do"
+  "Else"
+  "For"
+  "If"
+  "Elif"
+  "Return"
+  "While"
+  "Exit"
+  "End"
+  "Macro"
+  "Class"
+  "Var"
+  "File"
 ] @keyword
 
-(boolean_literal) @boolean
-
-(constant_builtin) @constant.builtin
-(special_literal) @constant.builtin
-
-(variable_builtin) @variable.builtin
-;(macro_builtin) @function.builtin
-
-"import" @include
-"return" @keyword.return
-
-(attribute) @attribute
-
+; ============================================
+; Базовые типы данных (из V_* констант)
+; ============================================
 [
- "."
- ","
- ";"
+  "V_GENOBJ"
+  "V_DBFFILE"
+  "V_TXTFILE"
+  "V_ARRAY"
+  "V_STRUC"
+  "V_FILE"
+  "V_UNDEF"
+  "V_MONEYL"
+  "V_MONEY"
+  "V_NUMERIC"
+  "V_DECIMAL"
+  "V_R2M"
+  "V_PROC"
+  "V_MEMADDR"
+  "V_DTTM"
+  "V_TIME"
+  "V_DATE"
+  "V_BOOL"
+  "V_STRING"
+  "V_DOUBLEL"
+  "V_DOUBLE"
+  "V_INTEGER"
+] @type.builtin
+
+; ============================================
+; Storage types (bool, string, integer и т.д.)
+; ============================================
+[
+  "bool"
+  "string"
+  "integer"
+  "array"
+  "tarray"
+  "file"
+  "tbfile"
+  "tbfilelog"
+  "record"
+  "object"
+] @type
+
+; ============================================
+; Логические значения и this
+; ============================================
+[
+  "true"
+  "false"
+  "this"
+  "null"
+] @constant.builtin
+
+; ============================================
+; Операторы
+; ============================================
+[
+  "!="
+  "<="
+  ">="
+  "=="
+  "<"
+  ">"
+  "&"
+  "|"
+  "^"
+  "~"
+  "="
+  "%"
+  "*"
+  "/"
+  "-"
+  "+"
+  "++"
+  "--"
+  "and"
+  "or"
+  "not"
+] @operator
+
+; ============================================
+; Разделители
+; ============================================
+[
+  ";"
+  ","
+  "."
+  ":"
 ] @punctuation.delimiter
 
+; ============================================
+; Скобки
+; ============================================
 [
- "["
- "]"
- "("
- ")"
+  "("
+  ")"
+  "{"
+  "}"
+  "["
+  "]"
 ] @punctuation.bracket
 
-[
- "{"
- "}"
-] @punctuation.special
-
-(variable_definition (identifier) @variable)
-(variable_assignment (identifier) @variable)
-(qualification_prefix (identifier) @variable)
-
+; ============================================
+; Определения макросов
+; ============================================
 (macro_definition
-  "macro" @keyword.function
-  (identifier) @function)
-(macro_call (identifier) @function)
+  name: (identifier) @function) @item
 
-(constant_definition
-  "const" @definition.constant
-  (constant) @constant
-)
+; ============================================
+; Вызовы функций/макросов
+; ============================================
+(macro_call
+  name: (identifier) @function.call)
 
-(comment) @comment
-(number) @number
+; ============================================
+; Переменные
+; ============================================
+(variable_declaration
+  name: (identifier) @variable)
 
-(string) @string
-(template) @string
-(binary_operator) @operator
-(unary_operator) @operator
-(assignment_operator) @operator
+(identifier) @variable
 
-(class_definition (identifier) @class)
-(class_definition (identifier) @class (identifier) @class)
+; ============================================
+; Параметры
+; ============================================
+(parameter
+  (identifier) @parameter)
 
-
-(if_statement [
- "if"
- "elif"
- "else"
- "end"
-] @conditional)
-
-(for_loop [
-  "for"
-  "end"
-] @repeat)
-
-(while_loop [
- "while"
- "end"
-] @repeat)
-
-(record_definition [ "record" "file" ] @type.builtin (identifier) @variable)
-(record_definition (record_parameter) @attribute @keyword)
-
-(array_definition "array" @type.builtin (identifier) @variable)
-
-(error_handler "onerror" @exception)
+; ============================================
+; Константы в верхнем регистре
+; ============================================
+(identifier) @constant
+  (#match? @constant "^[A-ZЙЦУКЕНГШЩЗХФЫВАПРОЛДЖЭЪЯЧСМИТЬБЮ][A-Z0-9_ЙЦУКЕНГШЩЗХФЫВАПРОЛДЖЭЪЯЧСМИТЬБЮ]*$")
