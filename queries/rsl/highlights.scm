@@ -1,105 +1,71 @@
 ; ============================================
-; Комментарии
+; Комментарии, Строки и Числа
 ; ============================================
 (comment) @comment
-
-; ============================================
-; Строки
-; ============================================
 (string) @string
-
-; ============================================
-; Числа
-; ============================================
 (number) @number
+(money_literal) @number.float ; Наш новый денежный тип
 
 ; ============================================
-; Ключевые слова (узлы)
+; Ключевые слова (строго по словам)
 ; ============================================
-(import) @keyword
-(variable_definition) @keyword
-(macro_definition) @keyword
-(class_definition) @keyword
-(if_statement) @keyword
-(for_loop) @keyword
-(while_loop) @keyword
-(return_statement) @keyword
-(constant_definition) @keyword
-(with_definition) @keyword
-(record_definition) @keyword
+"import" @keyword.import
+"var" @keyword.modifier
+"macro" @keyword.function
+"class" @keyword.function
+"if" @keyword.conditional
+"elif" @keyword.conditional
+"else" @keyword.conditional
+"for" @keyword.repeat
+"while" @keyword.repeat
+"return" @keyword.return
+"const" @keyword.modifier
+"with" @keyword
+"record" @keyword
+"file" @keyword
+"array" @keyword
+"end" @keyword
+"onerror" @keyword.exception
 
 ; ============================================
-; Идентификаторы (все как переменные)
+; Идентификаторы
 ; ============================================
 (identifier) @variable
 
 ; ============================================
-; Определения макросов (имя функции)
+; Функции и Макросы
 ; ============================================
-(macro_definition
-  name: (identifier) @function)
+(macro_definition name: (identifier) @function)
+(macro_call name: (identifier) @function.call)
+(macro_call name: (variable_builtin) @variable.builtin) ; Для this.Method()
 
 ; ============================================
-; Вызовы макросов
+; Типы
 ; ============================================
-(macro_call
-  name: (identifier) @function.call)
-
-; ============================================
-; Аннотации типов (Var var:ClassName)
-; ============================================
-(type_declaration
-  (type) @type)
-
-; ============================================
-; Скалярные типы (integer, string, bool и т.д.)
-; ============================================
+(type_declaration (type) @type)
 (scalar_type) @type.builtin
+(object_type (identifier) @type)
 
 ; ============================================
-; Объектные типы (clLogger, TRecHandler)
+; Встроенные значения
 ; ============================================
-(object_type
-  (identifier) @type)
-
-; ============================================
-; Логические значения
-; ============================================
-(boolean_literal) @constant.builtin
-
-; ============================================
-; Встроенные константы (V_INTEGER, V_STRING и т.д.)
-; ============================================
+(boolean_literal) @boolean
 (constant_builtin) @constant.builtin
-
-; ============================================
-; Специальные литералы (null, nullval, optval)
-; ============================================
 (special_literal) @constant.builtin
-
-; ============================================
-; Встроенные переменные (this, {curdate})
-; ============================================
 (variable_builtin) @variable.builtin
 
 ; ============================================
-; Операторы
+; Операторы и Разделители
 ; ============================================
 (binary_operator) @operator
 (unary_operator) @operator
 (assignment_operator) @operator
 
-; ============================================
-; Разделители
-; ============================================
 ";" @punctuation.delimiter
 "," @punctuation.delimiter
 "." @punctuation.delimiter
 ":" @punctuation.delimiter
 
-; ============================================
-; Скобки
-; ============================================
 "(" @punctuation.bracket
 ")" @punctuation.bracket
 "[" @punctuation.bracket

@@ -1,21 +1,24 @@
-; Функция как объект (af, if в Vim)
+; Функции (Макросы)
 (macro_definition) @function.outer
-(macro_definition
-  body: (_) @function.inner)
+(macro_body) @function.inner
 
-; Класс как объект
+; Классы
 (class_definition) @class.outer
-(class_definition
-  body: (_) @class.inner)
+(class_body) @class.inner
 
-; Блок кода
-(block) @block.outer
-(block) @block.inner
+; Любые списки выражений (как замена block)
+(_statement_list) @block.outer
+(_statement_list) @block.inner
 
-; Комментарий
+; Комментарии
 (comment) @comment.outer
 (comment) @comment.inner
 
-; Параметры
+; Аргументы и параметры
 (parameter_list) @parameter.outer
-(parameter) @parameter.inner
+(parameter_list
+  (_typed_identifier) @parameter.inner)
+
+(argument_list) @parameter.outer
+(argument_list
+  (_expression) @parameter.inner)

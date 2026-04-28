@@ -1,7 +1,7 @@
 ; Макросы
 (macro_definition
-  name: (identifier) @name) @item
+  name: (identifier) @name) @symbol
 
 ; Классы
 (class_definition
-  class_name: (identifier) @name) @item
+  class_name: (identifier) @name) @symbol

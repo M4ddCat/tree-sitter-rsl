@@ -6,8 +6,7 @@ module.exports = grammar({
   word: ($) => $._word_identifier,
 
   conflicts: ($) => [
-    [$.variable_definition, $.identifier],
-    [$._expression, $.variable_assignment],
+    [$._macro_call_without_parentheses, $._subscript_identifier],
   ],
 
   rules: {
@@ -208,14 +207,14 @@ module.exports = grammar({
 
     money_literal: ($) => /\$[0-9]+(\.[0-9]+)?/,
 
-    string: ($) => seq(
+    string: ($) => repeat1(seq(
       '"',
       repeat(choice(
         /[^"\\\n]/,
         /\\[\\"nrt]/
       )),
       '"'
-    ),
+    )),
 
     comment: ($) =>
       token(
@@ -254,14 +253,7 @@ module.exports = grammar({
 
     parameter_list: ($) => seq("(", commaSep($._typed_identifier), ")"),
 
-    argument_list: ($) => seq(
-      "(", 
-      optional(seq(
-        $._expression,
-        repeat(seq(optional(","), $._expression))
-      )), 
-      ")"
-    ),
+    argument_list: ($) => seq("(", optional(commaSep($._expression)), ")"),
 
     for_loop: ($) =>
       seq(
