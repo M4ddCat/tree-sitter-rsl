@@ -1444,8 +1444,17 @@
                   "name": "assignment_operator"
                 },
                 {
-                  "type": "SYMBOL",
-                  "name": "_expression"
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_expression"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "variable_assignment"
+                    }
+                  ]
                 }
               ]
             },

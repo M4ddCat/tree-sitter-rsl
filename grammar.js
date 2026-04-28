@@ -152,7 +152,10 @@ module.exports = grammar({
     _variable_initialization: ($) =>
       seq(
         $._typed_identifier,
-        optional(seq($.assignment_operator, $._expression)),
+        optional(seq(
+          $.assignment_operator, 
+          choice($._expression, $.variable_assignment)
+        )),
       ),
 
     constant_definition: ($) =>

@@ -1819,6 +1819,10 @@
           "named": true
         },
         {
+          "type": "variable_assignment",
+          "named": true
+        },
+        {
           "type": "variable_builtin",
           "named": true
         }
