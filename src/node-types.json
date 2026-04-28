@@ -1373,6 +1373,11 @@
     "fields": {}
   },
   {
+    "type": "string",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "subscript",
     "named": true,
     "fields": {},
@@ -1913,6 +1918,10 @@
     "named": false
   },
   {
+    "type": "\"",
+    "named": false
+  },
+  {
     "type": "(",
     "named": false
   },
@@ -2200,10 +2209,6 @@
   {
     "type": "string",
     "named": false
-  },
-  {
-    "type": "string",
-    "named": true
   },
   {
     "type": "t",

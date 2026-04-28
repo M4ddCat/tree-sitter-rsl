@@ -1989,8 +1989,33 @@
       "value": "\\d+\\.\\d+"
     },
     "string": {
-      "type": "PATTERN",
-      "value": "\"([^\"\\\\]|\\\\.)*\""
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "\""
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": "[^\"\\\\\\n]"
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\\\[\\\\\"nrt]"
+              }
+            ]
+          }
+        },
+        {
+          "type": "STRING",
+          "value": "\""
+        }
+      ]
     },
     "comment": {
       "type": "TOKEN",
@@ -3318,6 +3343,10 @@
     [
       "variable_definition",
       "identifier"
+    ],
+    [
+      "_expression",
+      "variable_assignment"
     ]
   ],
   "precedences": [],

@@ -205,8 +205,17 @@ module.exports = grammar({
     number: ($) => choice($._integer, $._decimal),
     _integer: ($) => /\d+/,
     _decimal: ($) => /\d+\.\d+/,
-    
-    string: ($) => /"([^"\\]|\\.)*"/,
+
+    money_literal: ($) => /\$[0-9]+(\.[0-9]+)?/,
+
+    string: ($) => seq(
+      '"',
+      repeat(choice(
+        /[^"\\\n]/,
+        /\\[\\"nrt]/
+      )),
+      '"'
+    ),
 
     comment: ($) =>
       token(
@@ -245,7 +254,14 @@ module.exports = grammar({
 
     parameter_list: ($) => seq("(", commaSep($._typed_identifier), ")"),
 
-    argument_list: ($) => seq("(", optional(commaSep($._expression)), ")"),
+    argument_list: ($) => seq(
+      "(", 
+      optional(seq(
+        $._expression,
+        repeat(seq(optional(","), $._expression))
+      )), 
+      ")"
+    ),
 
     for_loop: ($) =>
       seq(
@@ -322,19 +338,7 @@ module.exports = grammar({
           "format_specifier",
           choice(
             $._integer,
-            "l",
-            "r",
-            "c",
-            "a",
-            "t",
-            "d",
-            "m",
-            "w",
-            "z",
-            "f",
-            "i",
-            "iv",
-            "v",
+            "l", "r", "c", "a", "t", "d", "m", "w", "z", "f", "i", "iv", "v",
           ),
         ),
       ),
@@ -348,10 +352,10 @@ module.exports = grammar({
         ),
       ),
 
-    _macro_call_without_parentheses: ($) => seq(field("name", $.identifier)),
+    _macro_call_without_parentheses: ($) => seq(field("name", choice($.identifier, $.variable_builtin))),
 
     _macro_call_with_parentheses: ($) =>
-      seq(field("name", $.identifier), $.argument_list),
+      seq(field("name", choice($.identifier, $.variable_builtin)), $.argument_list),
 
     variable_assignment: ($) =>
       seq(
@@ -367,6 +371,7 @@ module.exports = grammar({
         choice(
           $.identifier,
           $.number,
+          $.money_literal,
           $.string,
           $.parenthesized_expression,
           prec(-1, $.macro_call),
@@ -383,22 +388,18 @@ module.exports = grammar({
     parenthesized_expression: ($) => seq("(", $._expression, ")"),
 
     qualification_prefix: ($) =>
-      seq(choice($.identifier, $._macro_call_with_parentheses), "."),
+      seq(choice($.identifier, $.variable_builtin, $._macro_call_with_parentheses), "."),
 
     _subscript_identifier: ($) =>
-      seq(repeat($.qualification_prefix), $.identifier, $.subscript),
+      seq(repeat($.qualification_prefix), choice($.identifier, $.variable_builtin), $.subscript),
 
     subscript: ($) => seq("[", $._expression, "]"),
 
     binary_expression: ($) =>
-      prec.left(seq($._expression, $.binary_operator, $._expression)),
-      
-    binary_operator: ($) =>
       choice(
-        prec.left(3, $.multiplication_operator),
-        prec.left(2, $.add_operator),
-        prec.left(1, $.relation_operator),
-        prec.right($.assignment_operator),
+        prec.left(3, seq($._expression, $.multiplication_operator, $._expression)),
+        prec.left(2, seq($._expression, $.add_operator, $._expression)),
+        prec.left(1, seq($._expression, $.relation_operator, $._expression)),
       ),
       
     multiplication_operator: ($) => choice("*", "/", caseInsensitive("and")),
