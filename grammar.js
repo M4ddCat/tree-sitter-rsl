@@ -53,11 +53,11 @@ module.exports = grammar({
         $.with_definition,
       ),
 
-    class_body: ($) => semicolonSep1(choice($.macro_definition, $._statement)),
-
-    macro_body: ($) => semicolonSep1(choice($._statement, $.macro_definition)),
-
-    _statement_list: ($) => semicolonSep1($._statement),
+    class_body: ($) => repeat1(seq(choice($.macro_definition, $._statement), optional(";"))),
+    
+    macro_body: ($) => repeat1(seq(choice($._statement, $.macro_definition), optional(";"))),
+    
+    _statement_list: ($) => repeat1(seq($._statement, optional(";"))),
 
     macro_definition: ($) =>
       seq(
