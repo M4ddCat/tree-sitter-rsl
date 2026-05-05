@@ -4,7 +4,7 @@
 (comment) @comment
 (string) @string
 (number) @number
-(money_literal) @number.float ; Наш новый денежный тип
+(money_literal) @number.float
 
 ; ============================================
 ; Ключевые слова (строго по словам)
@@ -37,7 +37,7 @@
 ; ============================================
 (macro_definition name: (identifier) @function)
 (macro_call name: (identifier) @function.call)
-(macro_call name: (variable_builtin) @variable.builtin) ; Для this.Method()
+(macro_call name: (variable_builtin) @variable.builtin)
 
 ; ============================================
 ; Типы
@@ -57,7 +57,9 @@
 ; ============================================
 ; Операторы и Разделители
 ; ============================================
-(binary_operator) @operator
+(multiplication_operator) @operator
+(add_operator) @operator
+(relation_operator) @operator
 (unary_operator) @operator
 (assignment_operator) @operator
 
