@@ -358,7 +358,7 @@ module.exports = grammar({
           repeat($.qualification_prefix),
           $.identifier,
           $.assignment_operator,
-          $._expression,
+          choice($._expression, $.variable_assignment),
         )
       ),
       
