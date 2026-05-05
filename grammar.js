@@ -353,11 +353,13 @@ module.exports = grammar({
       seq(field("name", choice($.identifier, $.variable_builtin)), $.argument_list),
 
     variable_assignment: ($) =>
-      seq(
-        repeat($.qualification_prefix),
-        $.identifier,
-        $.assignment_operator,
-        $._expression,
+      prec.right(
+        seq(
+          repeat($.qualification_prefix),
+          $.identifier,
+          $.assignment_operator,
+          $._expression,
+        )
       ),
       
     _expression: ($) =>
