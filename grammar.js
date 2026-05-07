@@ -6,14 +6,20 @@ module.exports = grammar({
   word: ($) => $._word_identifier,
 
   conflicts: ($) => [
-    [$.variable_definition, $.identifier],
-    [$._expression, $.variable_assignment],
+    [$._macro_call_without_parentheses, $._subscript_identifier],
+    [$.if_statement],
+    [$.number, $._format_specifier],
+    [$.qualification_prefix, $._subscript_identifier],
+    [$._subscript_identifier],
+    [$.rsdcommand_statement],
+    [$._macro_call_without_parentheses, $._macro_call_with_parentheses],
+    [$.qualification_prefix],
   ],
 
   rules: {
     unit: ($) =>
       seq(
-        optional(semicolonSep1(choice($.import, $._definition, $._statement))),
+        repeat(choice($.import, $._definition, $._statement, ";")),
         optional($.error_handler),
         optional(seq($._end, optional(";"))),
       ),
@@ -22,10 +28,8 @@ module.exports = grammar({
       seq(
         caseInsensitive("onerror"),
         optional(seq("(", $.identifier, ")")),
-        $._statement_list,
+        optional($._statement_list),
       ),
-
-    _definition_list: ($) => semicolonSep1($._definition),
 
     import: ($) => seq(caseInsensitive("import"), commaSep1($.filename)),
 
@@ -46,6 +50,7 @@ module.exports = grammar({
         $.if_statement,
         $.return_statement,
         $.output_statement,
+        $.rsdcommand_statement,
         $.macro_call,
         $.constant_definition,
         $.variable_definition,
@@ -53,11 +58,9 @@ module.exports = grammar({
         $.with_definition,
       ),
 
-    class_body: ($) => semicolonSep1(choice($.macro_definition, $._statement)),
-
-    macro_body: ($) => semicolonSep1(choice($._statement, $.macro_definition)),
-
-    _statement_list: ($) => semicolonSep1($._statement),
+    class_body: ($) => repeat1(choice($.macro_definition, $._statement, ";")),
+    macro_body: ($) => repeat1(choice($._statement, $.macro_definition, ";")),
+    _statement_list: ($) => repeat1(choice($._statement, ";")),
 
     macro_definition: ($) =>
       seq(
@@ -153,7 +156,10 @@ module.exports = grammar({
     _variable_initialization: ($) =>
       seq(
         $._typed_identifier,
-        optional(seq($.assignment_operator, $._expression)),
+        optional(seq(
+          $.assignment_operator, 
+          choice($._expression, $.variable_assignment)
+        )),
       ),
 
     constant_definition: ($) =>
@@ -205,8 +211,20 @@ module.exports = grammar({
     number: ($) => choice($._integer, $._decimal),
     _integer: ($) => /\d+/,
     _decimal: ($) => /\d+\.\d+/,
-    
-    string: ($) => /"([^"\\]|\\.)*"/,
+
+    money_literal: ($) => /\$[0-9]+(\.[0-9]+)?/,
+
+    string: ($) => token(choice(
+      seq('"', '$', /[^"]*/, '"'),
+      seq(
+        '"',
+        repeat(choice(
+          /[^"\\\n]+/, 
+          /\\./        
+        )),
+        '"'
+      )
+    )),
 
     comment: ($) =>
       token(
@@ -239,7 +257,7 @@ module.exports = grammar({
         "(",
         $.identifier,
         ")",
-        $._statement_list,
+        optional($._statement_list),
         $._end,
       ),
 
@@ -286,12 +304,11 @@ module.exports = grammar({
         ),
       ),
 
-    if_statement: ($) =>
-      seq(
+    if_statement: ($) => choice(
+      prec.dynamic(1, seq(
         caseInsensitive("if"),
         field("condition", $.parenthesized_expression),
         optional($._statement_list),
-
         repeat(
           seq(
             caseInsensitive("elif"),
@@ -299,16 +316,27 @@ module.exports = grammar({
             optional($._statement_list),
           ),
         ),
-
         optional(seq(caseInsensitive("else"), optional($._statement_list))),
-
         $._end,
-      ),
+      )),
+
+      prec.dynamic(-1, seq(
+        caseInsensitive("if"),
+        field("condition", $.parenthesized_expression),
+        choice($._statement, ";")
+      ))
+    ),
 
     return_statement: ($) => seq(caseInsensitive("return"), $._expression),
 
     output_statement: ($) =>
       seq(seq("[", $.template, "]"), optional($.formatted_argument_list)),
+
+    rsdcommand_statement: ($) =>
+      seq(
+        caseInsensitive("rsdcommand"),
+        repeat1($._expression)
+      ),
 
     template: ($) => /[^]]*/,
 
@@ -322,43 +350,36 @@ module.exports = grammar({
           "format_specifier",
           choice(
             $._integer,
-            "l",
-            "r",
-            "c",
-            "a",
-            "t",
-            "d",
-            "m",
-            "w",
-            "z",
-            "f",
-            "i",
-            "iv",
-            "v",
+            "l", "r", "c", "a", "t", "d", "m", "w", "z", "f", "i", "iv", "v",
           ),
         ),
       ),
 
     macro_call: ($) =>
       seq(
-        repeat($.qualification_prefix),
+        repeat($.qualification_prefix), 
         choice(
           $._macro_call_with_parentheses,
           prec(-2, $._macro_call_without_parentheses),
         ),
       ),
 
-    _macro_call_without_parentheses: ($) => seq(field("name", $.identifier)),
+    _macro_call_without_parentheses: ($) => seq(field("name", choice($.identifier, $.variable_builtin))),
 
     _macro_call_with_parentheses: ($) =>
-      seq(field("name", $.identifier), $.argument_list),
+      seq(field("name", choice($.identifier, $.variable_builtin)), $.argument_list),
 
     variable_assignment: ($) =>
-      seq(
-        repeat($.qualification_prefix),
-        $.identifier,
-        $.assignment_operator,
-        $._expression,
+      prec.right(
+        seq(
+          choice(
+            seq(repeat($.qualification_prefix), field("property", $.identifier)), 
+            $._subscript_identifier,                           
+            seq(repeat($.qualification_prefix), $._macro_call_with_parentheses)   
+          ),
+          $.assignment_operator,
+          choice($._expression, $.variable_assignment),
+        )
       ),
       
     _expression: ($) =>
@@ -367,6 +388,7 @@ module.exports = grammar({
         choice(
           $.identifier,
           $.number,
+          $.money_literal,
           $.string,
           $.parenthesized_expression,
           prec(-1, $.macro_call),
@@ -377,28 +399,31 @@ module.exports = grammar({
           $.special_literal,
           $.constant_builtin,
           $.variable_builtin,
+          $.range_expression, 
         ),
       ),
 
+    range_expression: ($) => prec.left(1, seq($._expression, ':', $._expression)),
+
     parenthesized_expression: ($) => seq("(", $._expression, ")"),
 
-    qualification_prefix: ($) =>
-      seq(choice($.identifier, $._macro_call_with_parentheses), "."),
+    _prefix_item: ($) => choice($.identifier, $.variable_builtin, $._macro_call_with_parentheses, $._subscript_identifier),
+
+    qualification_prefix: ($) => prec.left(1, choice(
+      seq($._prefix_item, "."),
+      seq($.qualification_prefix, $._prefix_item, ".")
+    )),
 
     _subscript_identifier: ($) =>
-      seq(repeat($.qualification_prefix), $.identifier, $.subscript),
+      seq(optional($.qualification_prefix), choice($.identifier, $.variable_builtin), repeat1($.subscript)),
 
     subscript: ($) => seq("[", $._expression, "]"),
 
     binary_expression: ($) =>
-      prec.left(seq($._expression, $.binary_operator, $._expression)),
-      
-    binary_operator: ($) =>
       choice(
-        prec.left(3, $.multiplication_operator),
-        prec.left(2, $.add_operator),
-        prec.left(1, $.relation_operator),
-        prec.right($.assignment_operator),
+        prec.left(3, seq($._expression, $.multiplication_operator, $._expression)),
+        prec.left(2, seq($._expression, $.add_operator, $._expression)),
+        prec.left(1, seq($._expression, $.relation_operator, $._expression)),
       ),
       
     multiplication_operator: ($) => choice("*", "/", caseInsensitive("and")),
@@ -438,12 +463,4 @@ function commaSep(rule, delimiter = ",") {
 
 function commaSep1(rule, delimiter = ",") {
   return seq(rule, repeat(seq(delimiter, rule)));
-}
-
-function semicolonSep1(rule, delimiter = ";") {
-  return seq(rule, repeat(seq(delimiter, rule)), optional(delimiter));
-}
-
-function semicolonSep(rule, delimiter = ";") {
-  return optional(semicolonSep1(rule, delimiter));
 }

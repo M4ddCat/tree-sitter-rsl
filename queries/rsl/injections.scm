@@ -1,9 +1,9 @@
-; SQL инъекции в строках с префиксом "sql:"
+; SQL инъекции в строках (учитываем открывающую кавычку)
 (string) @injection.content
-  (#match? @injection.content "^sql:")
+  (#match? @injection.content "^\"(?i)sql:")
   (#set! injection.language "sql")
 
-; Комментарии с SQL
+; Комментарии с SQL (учитываем слеши)
 (comment) @injection.content
-  (#match? @injection.content "^-- sql")
+  (#match? @injection.content "^//\\s*(?i)sql")
   (#set! injection.language "sql")

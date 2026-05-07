@@ -1,154 +1,76 @@
 ; ============================================
-; Комментарии
+; Комментарии, Строки и Числа
 ; ============================================
 (comment) @comment
-
-; ============================================
-; Строки
-; ============================================
 (string) @string
-(template) @string
-
-; ============================================
-; Числа
-; ============================================
 (number) @number
-(float) @number.float
+(money_literal) @number.float
 
 ; ============================================
-; Ключевые слова
+; Ключевые слова (строго по словам)
 ; ============================================
-[
-  "Import"
-  "Break"
-  "Continue"
-  "Do"
-  "Else"
-  "For"
-  "If"
-  "Elif"
-  "Return"
-  "While"
-  "Exit"
-  "End"
-  "Macro"
-  "Class"
-  "Var"
-  "File"
-  "Const"
-  "Private"
-  "Local"
-  "Key"
-  "OnError"
-] @keyword
+"import" @keyword.import
+"var" @keyword.modifier
+"macro" @keyword.function
+"class" @keyword.function
+"if" @keyword.conditional
+"elif" @keyword.conditional
+"else" @keyword.conditional
+"for" @keyword.repeat
+"while" @keyword.repeat
+"return" @keyword.return
+"const" @keyword.modifier
+"with" @keyword
+"record" @keyword
+"file" @keyword
+"array" @keyword
+"end" @keyword
+"onerror" @keyword.exception
 
 ; ============================================
-; Операторы
-; ============================================
-[
-  "+"
-  "-"
-  "*"
-  "/"
-  "%"
-  "="
-  "=="
-  "!="
-  "<"
-  ">"
-  "<="
-  ">="
-  "&"
-  "|"
-  "^"
-  "~"
-] @operator
-
-; ============================================
-; Логические операторы
-; ============================================
-[
-  "and"
-  "or"
-  "not"
-] @keyword.operator
-
-; ============================================
-; Разделители
-; ============================================
-[
-  ";"
-  ","
-  "."
-  ":"
-] @punctuation.delimiter
-
-; ============================================
-; Скобки
-; ============================================
-[
-  "("
-  ")"
-  "["
-  "]"
-  "{"
-  "}"
-] @punctuation.bracket
-
-; ============================================
-; Определения макросов
-; ============================================
-(macro_definition
-  name: (identifier) @function)
-
-; ============================================
-; Определения классов
-; ============================================
-(class_definition
-  name: (identifier) @type)
-
-; ============================================
-; Вызовы макросов
-; ============================================
-(macro_call
-  name: (identifier) @function.call)
-
-; ============================================
-; Переменные
-; ============================================
-(variable_definition
-  (identifier) @variable)
-
-(variable_assignment
-  (identifier) @variable)
-
-; ============================================
-; Параметры
-; ============================================
-(parameter
-  (identifier) @parameter)
-
-; ============================================
-; Идентификаторы (базовые)
+; Идентификаторы
 ; ============================================
 (identifier) @variable
 
 ; ============================================
-; Константы в верхнем регистре
+; Функции и Макросы
 ; ============================================
-(identifier) @constant
-  (#match? @constant "^[A-Z][A-Z0-9_]*$")
+(macro_definition name: (identifier) @function)
+(macro_call name: (identifier) @function.call)
+(macro_call name: (variable_builtin) @variable.builtin)
 
 ; ============================================
-; Атрибуты
+; Типы
 ; ============================================
-(attribute) @attribute
+(type_declaration (type) @type)
+(scalar_type) @type.builtin
+(object_type (identifier) @type)
 
 ; ============================================
-; Логические значения
+; Встроенные значения
 ; ============================================
-[
-  "true"
-  "false"
-  "null"
-] @boolean
+(boolean_literal) @boolean
+(constant_builtin) @constant.builtin
+(special_literal) @constant.builtin
+(variable_builtin) @variable.builtin
+
+; ============================================
+; Операторы и Разделители
+; ============================================
+(multiplication_operator) @operator
+(add_operator) @operator
+(relation_operator) @operator
+(unary_operator) @operator
+(assignment_operator) @operator
+
+";" @punctuation.delimiter
+"," @punctuation.delimiter
+"." @punctuation.delimiter
+":" @punctuation.delimiter
+
+"(" @punctuation.bracket
+")" @punctuation.bracket
+"[" @punctuation.bracket
+"]" @punctuation.bracket
+"{" @punctuation.bracket
+"}" @punctuation.bracket
