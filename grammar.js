@@ -6,20 +6,22 @@ module.exports = grammar({
   word: ($) => $._word_identifier,
 
   conflicts: ($) => [
-    [$._macro_call_without_parentheses, $._subscript_identifier],
     [$.if_statement],
     [$.number, $._format_specifier],
-    [$.qualification_prefix, $._subscript_identifier],
     [$._subscript_identifier],
-    [$.rsdcommand_statement],
+    [$.rsdcommand_call], 
+    [$._statement],
+    [$.return_statement],
+    [$._rsd_argument, $._expression], 
+    [$._rsd_argument, $._macro_name, $._expression], 
     [$._macro_call_without_parentheses, $._macro_call_with_parentheses],
-    [$.qualification_prefix],
+    [$._macro_name, $._subscript_identifier],
   ],
 
   rules: {
     unit: ($) =>
       seq(
-        repeat(choice($.import, $._definition, $._statement, ";")),
+        repeat(choice($.import, $._definition, $._statement)),
         optional($.error_handler),
         optional(seq($._end, optional(";"))),
       ),
@@ -41,8 +43,11 @@ module.exports = grammar({
 
     _definition: ($) => choice($.macro_definition, $.class_definition),
 
-    _statement: ($) =>
+    _statement: ($) => seq($._statement_core, optional(";")),
+
+    _statement_core: ($) =>
       choice(
+        $.empty_statement,
         $.array_definition,
         $.record_definition,
         $.while_loop,
@@ -50,7 +55,7 @@ module.exports = grammar({
         $.if_statement,
         $.return_statement,
         $.output_statement,
-        $.rsdcommand_statement,
+        $.rsdcommand_call,
         $.macro_call,
         $.constant_definition,
         $.variable_definition,
@@ -58,9 +63,11 @@ module.exports = grammar({
         $.with_definition,
       ),
 
-    class_body: ($) => repeat1(choice($.macro_definition, $._statement, ";")),
-    macro_body: ($) => repeat1(choice($._statement, $.macro_definition, ";")),
-    _statement_list: ($) => repeat1(choice($._statement, ";")),
+    empty_statement: ($) => ";",
+
+    class_body: ($) => repeat1(choice($.macro_definition, $._statement)),
+    macro_body: ($) => repeat1(choice($._statement, $.macro_definition)),
+    _statement_list: ($) => repeat1($._statement),
 
     macro_definition: ($) =>
       seq(
@@ -215,15 +222,8 @@ module.exports = grammar({
     money_literal: ($) => /\$[0-9]+(\.[0-9]+)?/,
 
     string: ($) => token(choice(
-      seq('"', '$', /[^"]*/, '"'),
-      seq(
-        '"',
-        repeat(choice(
-          /[^"\\\n]+/, 
-          /\\./        
-        )),
-        '"'
-      )
+      /"\$[^"]*"/,
+      /"([^"\\\n]|\\.)*"/
     )),
 
     comment: ($) =>
@@ -319,24 +319,18 @@ module.exports = grammar({
         optional(seq(caseInsensitive("else"), optional($._statement_list))),
         $._end,
       )),
-
+      
       prec.dynamic(-1, seq(
         caseInsensitive("if"),
         field("condition", $.parenthesized_expression),
-        choice($._statement, ";")
+        $._statement
       ))
     ),
 
-    return_statement: ($) => seq(caseInsensitive("return"), $._expression),
+    return_statement: ($) => seq(caseInsensitive("return"), optional($._expression)),
 
     output_statement: ($) =>
       seq(seq("[", $.template, "]"), optional($.formatted_argument_list)),
-
-    rsdcommand_statement: ($) =>
-      seq(
-        caseInsensitive("rsdcommand"),
-        repeat1($._expression)
-      ),
 
     template: ($) => /[^]]*/,
 
@@ -355,6 +349,32 @@ module.exports = grammar({
         ),
       ),
 
+    _rsd_argument: ($) =>
+      prec(
+        1,
+        choice(
+          $.identifier,
+          $.number,
+          $.money_literal,
+          $.string,
+          $.parenthesized_expression,
+          prec(-1, $.macro_call),
+          $.binary_expression,
+          $.unary_expression,
+          $._subscript_identifier,
+          $.boolean_literal,
+          $.special_literal,
+          $.constant_builtin,
+          $.variable_builtin
+        )
+      ),
+
+    rsdcommand_call: ($) =>
+      choice(
+        seq(caseInsensitive("rsdcommand"), "(", repeat($._rsd_argument), ")"), // Со скобками
+        seq(caseInsensitive("rsdcommand"), repeat1($._rsd_argument))           // Без скобок
+      ),
+
     macro_call: ($) =>
       seq(
         repeat($.qualification_prefix), 
@@ -364,10 +384,21 @@ module.exports = grammar({
         ),
       ),
 
-    _macro_call_without_parentheses: ($) => seq(field("name", choice($.identifier, $.variable_builtin))),
+    _macro_name: ($) => choice(
+      $.identifier, 
+      $.variable_builtin, 
+      $.scalar_type,
+      caseInsensitive("tbfile"),
+      caseInsensitive("trechandler"),
+      caseInsensitive("tarray"),
+      caseInsensitive("tstreamdoc"),
+      caseInsensitive("object")
+    ),
+
+    _macro_call_without_parentheses: ($) => seq(field("name", $._macro_name)),
 
     _macro_call_with_parentheses: ($) =>
-      seq(field("name", choice($.identifier, $.variable_builtin)), $.argument_list),
+      seq(field("name", $._macro_name), $.argument_list),
 
     variable_assignment: ($) =>
       prec.right(
@@ -392,6 +423,7 @@ module.exports = grammar({
           $.string,
           $.parenthesized_expression,
           prec(-1, $.macro_call),
+          $.rsdcommand_call,
           $.binary_expression,
           $.unary_expression,
           $._subscript_identifier,
@@ -409,13 +441,10 @@ module.exports = grammar({
 
     _prefix_item: ($) => choice($.identifier, $.variable_builtin, $._macro_call_with_parentheses, $._subscript_identifier),
 
-    qualification_prefix: ($) => prec.left(1, choice(
-      seq($._prefix_item, "."),
-      seq($.qualification_prefix, $._prefix_item, ".")
-    )),
+    qualification_prefix: ($) => seq($._prefix_item, "."),
 
     _subscript_identifier: ($) =>
-      seq(optional($.qualification_prefix), choice($.identifier, $.variable_builtin), repeat1($.subscript)),
+      seq(repeat($.qualification_prefix), choice($.identifier, $.variable_builtin), repeat1($.subscript)),
 
     subscript: ($) => seq("[", $._expression, "]"),
 

@@ -53,6 +53,10 @@
           "named": true
         },
         {
+          "type": "rsdcommand_call",
+          "named": true
+        },
+        {
           "type": "special_literal",
           "named": true
         },
@@ -160,6 +164,10 @@
           "named": true
         },
         {
+          "type": "rsdcommand_call",
+          "named": true
+        },
+        {
           "type": "special_literal",
           "named": true
         },
@@ -204,6 +212,10 @@
           "named": true
         },
         {
+          "type": "empty_statement",
+          "named": true
+        },
+        {
           "type": "for_loop",
           "named": true
         },
@@ -232,7 +244,7 @@
           "named": true
         },
         {
-          "type": "rsdcommand_statement",
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -400,6 +412,10 @@
           "named": true
         },
         {
+          "type": "rsdcommand_call",
+          "named": true
+        },
+        {
           "type": "special_literal",
           "named": true
         },
@@ -423,6 +439,11 @@
     }
   },
   {
+    "type": "empty_statement",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "error_handler",
     "named": true,
     "fields": {},
@@ -436,6 +457,10 @@
         },
         {
           "type": "constant_definition",
+          "named": true
+        },
+        {
+          "type": "empty_statement",
           "named": true
         },
         {
@@ -467,7 +492,7 @@
           "named": true
         },
         {
-          "type": "rsdcommand_statement",
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -557,6 +582,10 @@
             "named": true
           },
           {
+            "type": "rsdcommand_call",
+            "named": true
+          },
+          {
             "type": "special_literal",
             "named": true
           },
@@ -620,6 +649,10 @@
           },
           {
             "type": "range_expression",
+            "named": true
+          },
+          {
+            "type": "rsdcommand_call",
             "named": true
           },
           {
@@ -689,6 +722,10 @@
             "named": true
           },
           {
+            "type": "rsdcommand_call",
+            "named": true
+          },
+          {
             "type": "special_literal",
             "named": true
           },
@@ -743,6 +780,10 @@
           "named": true
         },
         {
+          "type": "empty_statement",
+          "named": true
+        },
+        {
           "type": "for_arguments",
           "named": true
         },
@@ -771,7 +812,7 @@
           "named": true
         },
         {
-          "type": "rsdcommand_statement",
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -901,6 +942,10 @@
           "named": true
         },
         {
+          "type": "rsdcommand_call",
+          "named": true
+        },
+        {
           "type": "special_literal",
           "named": true
         },
@@ -956,6 +1001,10 @@
           "named": true
         },
         {
+          "type": "empty_statement",
+          "named": true
+        },
+        {
           "type": "for_loop",
           "named": true
         },
@@ -980,7 +1029,7 @@
           "named": true
         },
         {
-          "type": "rsdcommand_statement",
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -1034,6 +1083,10 @@
           "named": true
         },
         {
+          "type": "empty_statement",
+          "named": true
+        },
+        {
           "type": "for_loop",
           "named": true
         },
@@ -1062,7 +1115,7 @@
           "named": true
         },
         {
-          "type": "rsdcommand_statement",
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -1095,6 +1148,30 @@
           {
             "type": "identifier",
             "named": true
+          },
+          {
+            "type": "object",
+            "named": false
+          },
+          {
+            "type": "scalar_type",
+            "named": true
+          },
+          {
+            "type": "tarray",
+            "named": false
+          },
+          {
+            "type": "tbfile",
+            "named": false
+          },
+          {
+            "type": "trechandler",
+            "named": false
+          },
+          {
+            "type": "tstreamdoc",
+            "named": false
           },
           {
             "type": "variable_builtin",
@@ -1279,6 +1356,10 @@
           "named": true
         },
         {
+          "type": "rsdcommand_call",
+          "named": true
+        },
+        {
           "type": "special_literal",
           "named": true
         },
@@ -1312,6 +1393,30 @@
           {
             "type": "identifier",
             "named": true
+          },
+          {
+            "type": "object",
+            "named": false
+          },
+          {
+            "type": "scalar_type",
+            "named": true
+          },
+          {
+            "type": "tarray",
+            "named": false
+          },
+          {
+            "type": "tbfile",
+            "named": false
+          },
+          {
+            "type": "trechandler",
+            "named": false
+          },
+          {
+            "type": "tstreamdoc",
+            "named": false
           },
           {
             "type": "variable_builtin",
@@ -1396,6 +1501,10 @@
           "named": true
         },
         {
+          "type": "rsdcommand_call",
+          "named": true
+        },
+        {
           "type": "special_literal",
           "named": true
         },
@@ -1461,7 +1570,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "binary_expression",
@@ -1501,6 +1610,10 @@
         },
         {
           "type": "range_expression",
+          "named": true
+        },
+        {
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -1527,12 +1640,12 @@
     }
   },
   {
-    "type": "rsdcommand_statement",
+    "type": "rsdcommand_call",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "binary_expression",
@@ -1568,10 +1681,6 @@
         },
         {
           "type": "qualification_prefix",
-          "named": true
-        },
-        {
-          "type": "range_expression",
           "named": true
         },
         {
@@ -1653,6 +1762,10 @@
         },
         {
           "type": "range_expression",
+          "named": true
+        },
+        {
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -1761,6 +1874,10 @@
           "named": true
         },
         {
+          "type": "rsdcommand_call",
+          "named": true
+        },
+        {
           "type": "special_literal",
           "named": true
         },
@@ -1814,6 +1931,10 @@
           "named": true
         },
         {
+          "type": "empty_statement",
+          "named": true
+        },
+        {
           "type": "error_handler",
           "named": true
         },
@@ -1850,7 +1971,7 @@
           "named": true
         },
         {
-          "type": "rsdcommand_statement",
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -1883,6 +2004,30 @@
           {
             "type": "identifier",
             "named": true
+          },
+          {
+            "type": "object",
+            "named": false
+          },
+          {
+            "type": "scalar_type",
+            "named": true
+          },
+          {
+            "type": "tarray",
+            "named": false
+          },
+          {
+            "type": "tbfile",
+            "named": false
+          },
+          {
+            "type": "trechandler",
+            "named": false
+          },
+          {
+            "type": "tstreamdoc",
+            "named": false
           },
           {
             "type": "variable_builtin",
@@ -1951,6 +2096,10 @@
         },
         {
           "type": "range_expression",
+          "named": true
+        },
+        {
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -2053,6 +2202,10 @@
           "named": true
         },
         {
+          "type": "rsdcommand_call",
+          "named": true
+        },
+        {
           "type": "special_literal",
           "named": true
         },
@@ -2111,6 +2264,10 @@
           "named": true
         },
         {
+          "type": "empty_statement",
+          "named": true
+        },
+        {
           "type": "for_loop",
           "named": true
         },
@@ -2135,7 +2292,7 @@
           "named": true
         },
         {
-          "type": "rsdcommand_statement",
+          "type": "rsdcommand_call",
           "named": true
         },
         {
@@ -2174,6 +2331,10 @@
           "named": true
         },
         {
+          "type": "empty_statement",
+          "named": true
+        },
+        {
           "type": "for_loop",
           "named": true
         },
@@ -2202,7 +2363,7 @@
           "named": true
         },
         {
-          "type": "rsdcommand_statement",
+          "type": "rsdcommand_call",
           "named": true
         },
         {
